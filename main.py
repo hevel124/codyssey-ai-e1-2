@@ -2,6 +2,29 @@
 
 MENU_LINE = "=" * 40
 
+class Quiz:
+    """퀴즈 1개(문제, 선택지 4개, 정답 번호)를 표현한다."""
+
+    def __init__(self, question, choices, answer):
+        self.question = question
+        self.choices = choices
+        self.answer = answer
+
+    def display(self, number):
+        """[문제 N] 형식으로 문제와 선택지를 출력한다."""
+        print(f"[문제 {number}]")
+        print(self.question)
+        print()
+        for index, choice in enumerate(self.choices, start=1):
+            print(f"{index}. {choice}")
+        print()
+
+    def is_correct(self, user_answer):
+        """입력한 번호가 정답 번호와 같으면 True를 돌려준다."""
+        return user_answer == self.answer
+
+
+
 def show_menu():
     """메뉴 화면을 출력한다."""
     print(MENU_LINE)
