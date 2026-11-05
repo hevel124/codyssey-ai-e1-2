@@ -25,7 +25,7 @@ class Quiz:
 
 
 def make_default_quizzes():
-    """기본 퀴즈 6개(주제: e1-1 개발 환경 미션)를 Quiz 객체 리스트로 만든다."""
+    """기본 퀴즈 6개(주제: 개발 환경 기초 - 터미널·Docker·Git)를 Quiz 객체 리스트로 만든다."""
     return [
         Quiz("현재 위치가 /home/test/practice일 때 ../note.txt가 가리키는 절대 경로는?",
              ["/home/test/practice/note.txt", "/home/test/note.txt", "/home/note.txt", "/note.txt"], 2),
