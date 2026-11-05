@@ -50,4 +50,7 @@ def main():
 
 # python3.13 main.py처럼 이 파일을 직접 실행 시 main() 호출
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (KeyboardInterrupt, EOFError):
+        print("\n\n⚠️ 입력이 중단되어 게임을 종료합니다.")
