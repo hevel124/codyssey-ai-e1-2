@@ -72,13 +72,38 @@ def read_number(prompt, min_value, max_value):
             return number
         print(error_message)
 
+def play_quiz(quizzes):
+    """저장된 퀴즈를 차례로 출제하고, 맞힌 개수와 점수를 출력한다."""
+    if not quizzes: #리스트가 비어있으면
+        print("\n⚠️ 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가하세요.\n")
+        return
+    print(f"\n📝 퀴즈를 시작합니다! (총 {len(quizzes)}문제)\n")
+    correct_count = 0
+    # 리스트를 숫자, 퀴즈 형태의 쌍으로 꺼내 주는 객체로 감싸고, 꺼낸 쌍을 언패킹(number, quiz)해서 대입
+    for number, quiz in enumerate(quizzes, start=1):
+        print("-" * 40)
+        quiz.display(number)        
+        user_answer = read_number("정답 입력: ", 1, 4) # 1~4 까지만 받음
+        #정,오답 체크
+        if quiz.is_correct(user_answer):
+            print("✅ 정답입니다!\n")
+            correct_count += 1
+        else:
+            print(f"❌ 오답입니다. 정답은 {quiz.answer}번입니다.\n")
+    score = correct_count * 100 // len(quizzes) # 맞은 문제수 * 100 // 총 문제 수 -> // 몫만 남기는 나눗셈
+    print(MENU_LINE)
+    print(f"🏆 결과: {len(quizzes)}문제 중 {correct_count}문제 정답! ({score}점)")
+    print(MENU_LINE)
+    print()
+
 def main():
     """메뉴를 보여 주고, 고른 번호에 맞는 화면을 실행한다."""
+    quizzes = make_default_quizzes()
     while True:
         show_menu()
         choice = read_number("선택: ", 1, 5)
         if choice == 1:
-            print("\n📝 퀴즈 풀기 화면입니다. (준비 중)\n")
+            play_quiz(quizzes)
         elif choice == 2:
             print("\n📌 퀴즈 추가 화면입니다. (준비 중)\n")
         elif choice == 3:
