@@ -24,6 +24,24 @@ class Quiz:
         return user_answer == self.answer
 
 
+def make_default_quizzes():
+    """기본 퀴즈 6개(주제: e1-1 개발 환경 미션)를 Quiz 객체 리스트로 만든다."""
+    return [
+        Quiz("현재 위치가 /home/test/practice일 때 ../note.txt가 가리키는 절대 경로는?",
+             ["/home/test/practice/note.txt", "/home/test/note.txt", "/home/note.txt", "/note.txt"], 2),
+        Quiz("파일 권한 755를 문자로 바꾸면?",
+             ["rw-r--r--", "rwx------", "rwxr-xr-x", "rwxrwxrwx"], 3),
+        Quiz("docker build -t e1-1-web:1.0 . 에서 -t의 역할은?",
+             ["포트를 연결한다", "백그라운드로 실행한다", "볼륨을 연결한다", "이미지 이름과 태그를 지정한다"], 4),
+        Quiz("docker run -p 8090:80 에서 8090은 무엇의 포트인가?",
+             ["내 컴퓨터(호스트)", "컨테이너", "Docker 볼륨", "GitHub 서버"], 1),
+        Quiz("컨테이너를 삭제해도 데이터가 남도록 Docker가 컨테이너 바깥에 관리하는 저장 공간은?",
+             ["이미지 태그", "포트 매핑", "볼륨", "네트워크 네임스페이스"], 3),
+        Quiz("내 컴퓨터에서 만든 커밋을 GitHub에 올리는 명령은?",
+             ["git commit", "git init", "git clone", "git push"], 4),
+    ]
+
+
 
 def show_menu():
     """메뉴 화면을 출력한다."""
