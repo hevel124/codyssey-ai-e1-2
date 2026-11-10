@@ -145,6 +145,8 @@ codyssey-ai-e1-2/
 - 없음(첫 실행): `📂 저장된 데이터가 없어 기본 퀴즈로 시작합니다.` 출력, 기본 퀴즈 6개로 실행
 - 손상(JSON 문법 오류 · 키 없음 등) 또는 읽기 실패: `⚠️ 저장 파일이 손상되었거나 읽을 수 없어 기본 퀴즈 데이터로 복구합니다.` 출력, 기본 퀴즈 6개로 계속 실행
 - 쓰기 실패: `⚠️ state.json에 저장하지 못했습니다.` 출력, 게임은 계속
+- 백업: 자동 백업 없음. 손상된 `state.json`은 바로 지우지 않고 다음 저장(퀴즈 추가 · 퀴즈 풀기 끝 · Ctrl+C/EOF 종료) 때 그 시점 데이터(기본 퀴즈 6개 + 이후 추가분)로 덮어씀. 메뉴 `5` 종료는 저장 안 함
+- 직접 백업: 실행 전 `cp state.json state.json.bak`으로 복사, 복구할 때 `cp state.json.bak state.json`
 
 ## 7. 과제 목표 정리
 
@@ -171,6 +173,7 @@ codyssey-ai-e1-2/
 **파일 입출력**
 - 파일 처리 과정: `open()`으로 열기 → 읽기(`"r"`) 또는 쓰기(`"w"`, 기존 내용 덮어씀) → 닫기. `with open(...) as file:`을 쓰면 블록이 끝날 때 자동으로 닫힘. 한글을 위해 `encoding="utf-8"` 지정
 - JSON: list·dict 같은 데이터를 글자로 적는 형식. 프로그램이 끝나면 사라지는 메모리 속 데이터를 파일로 남기고 다시 읽어 오기 위해 사용. 사람이 열어 읽을 수 있고 Python 표준 라이브러리 `json`으로 처리 (`json.dump` 저장, `json.load` 불러오기)
+- JSON 저장의 한계: 저장할 때마다 파일 전체를 다시 쓰고, 불러올 때 파일 전체를 메모리에 올림. 데이터가 많아지면 저장·불러오기가 느려지고 메모리 사용 증가. 데이터가 많거나 일부만 찾아 읽어야 하면 SQLite 같은 데이터베이스 사용
 - `try/except`: 오류가 날 수 있는 코드를 `try`에 두고, 지정한 오류가 나면 프로그램을 멈추지 않고 `except` 블록 실행 (예: `int("abc")`의 `ValueError` → 다시 입력)
 
 **Git 기초**
@@ -197,8 +200,8 @@ codyssey-ai-e1-2/
 
 **별도 로컬 디렉터리에 clone**
 ```bash
-$ cd ~/dev/code
-$ git clone https://hevel124@github.com/hevel124/codyssey-ai-e1-2.git codyssey-ai-e1-2-clone
+$ cd <작업 폴더>
+$ git clone https://github.com/hevel124/codyssey-ai-e1-2.git codyssey-ai-e1-2-clone
 Cloning into 'codyssey-ai-e1-2-clone'...
 remote: Enumerating objects: 77, done.
 remote: Counting objects: 100% (77/77), done.
@@ -242,7 +245,7 @@ To https://github.com/hevel124/codyssey-ai-e1-2.git
 
 **기존 로컬 작업 디렉터리에서 pull**
 ```bash
-$ cd ~/dev/code/codyssey-ai-e1-2
+$ cd <기존 작업 폴더>
 $ git pull
 remote: Enumerating objects: 5, done.
 remote: Counting objects: 100% (5/5), done.
@@ -273,3 +276,39 @@ c1e9f3e docs: README 작성 (개요, 실행 방법, 기능, 파일 구조, 데�
 - `35419b7`: `feature/play-quiz` 브랜치를 `main`에 병합한 커밋. 갈라진 선(`|\` ~ `|/`)이 브랜치 작업 구간
 
 ![git log --oneline --graph](docs/screenshots/git-log-graph.png)
+
+## 9. Git 커밋 기록
+
+**커밋 규칙**
+- 커밋 단위: 기능 하나를 완성할 때마다 커밋 (메뉴 · Quiz 클래스 · 기본 퀴즈 · 풀기 · 추가 · 목록 · 점수 · 클래스 정리 · 저장 · README). 스크린샷은 기능 커밋과 나눠 `docs:` 커밋
+- 메시지 형식: `접두어: 변경 요약`
+  - `feat`: 기능 추가 · `fix`: 오류 수정 · `docs`: 문서 · 스크린샷 · `refactor`: 동작은 그대로 두고 구조 정리 · `merge`: 브랜치 병합
+  - 처음 3개 커밋은 대문자(`Init` · `Docs` · `Feat`), 이후 소문자로 통일
+
+**커밋 목록** (이 절 작성 시점, 커밋 23개)
+```bash
+$ git --no-pager log --oneline
+e8a1e16 docs: README에 clone·pull 기록과 git log 그래프 추가
+41b7711 docs: README에 clone·pull 실습 절 제목 추가 (복제본에서)
+c1e9f3e docs: README 작성 (개요, 실행 방법, 기능, 파일 구조, 데이터 파일)
+722b2d4 feat: state.json 불러오기와 파일 오류 처리
+65e0669 refactor: QuizGame 클래스로 게임 구조 정리
+e750ef1 fix: 메뉴 5번 종료 분기 복구
+3839d9a docs: 점수 확인 스크린샷 추가
+594f8cc feat: 최고 점수 확인과 저장 기능 구현
+cac9b94 docs: 퀴즈 목록 스크린샷 추가
+0166556 feat: 퀴즈 목록 기능 구현
+45f141b docs: 퀴즈 추가 스크린샷 추가
+c2bfcff feat: 퀴즈 추가 기능과 state.json 저장 구현
+35419b7 merge:퀴즈 풀기 기능 (feature/play-quiz)
+d951194 docs: 퀴즈 풀기 스크린샷 추가
+492cbf1 feat: 퀴즈 풀기 기능 구현
+0bd22ac fix: 기본 퀴즈 설명 문구의 주제 이름 수정
+08f723a feat: 기본 퀴즈 데이터 6개 추가 (개발 환경 기초)
+c942680 feat: quiz 클래스 추가 (문제 출력, 정답 확인)
+1b9849f feat: ctrl+c와 입력 종료 시 안전 종료 처리
+0116220 docs: 메뉴 화면 스크린샷 추가
+228d8f4 Feat: 메뉴 출력과 번호 선택 기능구현
+8083f78 Docs: 개발 환경 설정 스크린샷 추가
+9995645 Init: 프로젝트 초기 설정 (.gitignore, README.md 추가)
+```
