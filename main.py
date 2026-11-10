@@ -87,6 +87,25 @@ class QuizGame:
     def __init__(self):
         self.quizzes = make_default_quizzes()
         self.best_score = None
+        self.load_state()
+
+    def load_state(self):
+        """state.json이 있으면 퀴즈 목록과 최고 점수를 불러온다. 없거나 읽을 수 없으면 기본 데이터로 시작한다."""
+        if not STATE_FILE.exists():
+            print("📂 저장된 데이터가 없어 기본 퀴즈로 시작합니다.")
+            return
+        try:
+            with open(STATE_FILE, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            quizzes = [Quiz(item["question"], item["choices"], item["answer"]) for item in data["quizzes"]]
+            best_score = data["best_score"]
+        except (OSError, ValueError, KeyError, TypeError):
+            print("⚠️ 저장 파일이 손상되었거나 읽을 수 없어 기본 퀴즈 데이터로 복구합니다.")
+            return
+        self.quizzes = quizzes
+        self.best_score = best_score
+        score_text = "없음" if best_score is None else f"{best_score}점"
+        print(f"📂 저장된 데이터를 불러왔습니다. (퀴즈 {len(quizzes)}개, 최고점수 {score_text})")
 
     def show_menu(self):
         """메뉴 화면을 출력한다."""
@@ -140,8 +159,11 @@ class QuizGame:
     def save_state(self):
         """퀴즈 목록과 최고 점수를 state.json에 UTF-8로 저장한다."""
         data = {"quizzes": [quiz.to_dict() for quiz in self.quizzes], "best_score": self.best_score}
-        with open(STATE_FILE, "w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=4)
+        try:
+            with open(STATE_FILE, "w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+        except OSError:
+            print("⚠️ state.json에 저장하지 못했습니다. 이번 변경은 파일에 남지 않습니다.")
 
     def show_quizzes(self):
         """저장된 퀴즈의 번호와 문제를 목록으로 출력한다."""
@@ -192,13 +214,14 @@ class QuizGame:
                 break   
 
 def main():
-    """QuizGame 객체를 하나 만들어 게임을 시작한다."""
+    """QuizGame 객체를 하나 만들어 게임을 시작한다. 입력이 중단되면 저장하고 끝낸다."""
     game = QuizGame()
-    game.run()
+    try:
+        game.run()
+    except (KeyboardInterrupt, EOFError):
+        print("\n\n⚠️ 입력이 중단되어 지금까지의 데이터를 저장하고 게임을 종료합니다.")
+        game.save_state()
 
 # python3.13 main.py처럼 이 파일을 직접 실행 시 main() 호출
 if __name__ == "__main__":
-    try:
-        main()
-    except (KeyboardInterrupt, EOFError):
-        print("\n\n⚠️ 입력이 중단되어 게임을 종료합니다.")
+    main()
