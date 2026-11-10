@@ -189,3 +189,5 @@ codyssey-ai-e1-2/
 
 - 브랜치 생성과 병합: `git checkout -b <브랜치>`로 갈라져 작업 → `git checkout main`으로 돌아옴 → `git merge <브랜치>`로 합침
 - clone과 pull: `git clone <URL>`로 원격 저장소를 처음 받고, 이후 원격에 생긴 변경은 `git pull`로 가져옴
+
+## 8. Git 저장소 복제 실습 (clone·pull)
