@@ -184,6 +184,9 @@ def main():
             show_quizzes(quizzes)
         elif choice == 4:
             show_score(best_score)
+        else:
+            print("\n👋 게임을 종료합니다.")
+            break
 
 # python3.13 main.py처럼 이 파일을 직접 실행 시 main() 호출
 if __name__ == "__main__":
