@@ -137,6 +137,19 @@ def save_state(quizzes):
     with open(STATE_FILE, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
 
+def show_quizzes(quizzes):
+    """저장된 퀴즈의 번호와 문제를 목록으로 출력한다."""
+    if not quizzes:
+        print("\n⚠️ 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가하세요.\n")
+        return
+    print(f"\n📋 등록된 퀴즈 목록 (총 {len(quizzes)}개)\n")
+    print("-" * 40)
+    for number, quiz in enumerate(quizzes, start=1):
+        print(f"[{number}] {quiz.question}")
+    print("-" * 40)
+    print()
+
+
 def main():
     """메뉴를 보여 주고, 고른 번호에 맞는 화면을 실행한다."""
     quizzes = make_default_quizzes()
@@ -148,7 +161,7 @@ def main():
         elif choice == 2:
             add_quiz(quizzes)
         elif choice == 3:
-            print("\n📋 퀴즈 목록 화면입니다. (준비 중)\n")
+            show_quizzes(quizzes)
         elif choice == 4:
             print("\n🏆 점수 확인 화면입니다. (준비 중)\n")
         else:
