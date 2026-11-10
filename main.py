@@ -118,8 +118,9 @@ def play_quiz(quizzes):
     print(f"🏆 결과: {len(quizzes)}문제 중 {correct_count}문제 정답! ({score}점)")
     print(MENU_LINE)
     print()
+    return score
 
-def add_quiz(quizzes):
+def add_quiz(quizzes, best_score):
     """문제·선택지 4개·정답 번호를 입력받아 퀴즈를 추가하고 파일에 저장한다."""
     print("\n📌 새로운 퀴즈를 추가합니다.\n")
     question = read_text("문제를 입력하세요: ")
@@ -128,12 +129,12 @@ def add_quiz(quizzes):
         choices.append(read_text(f"선택지 {number}: "))
     answer = read_number("정답 번호 (1-4): ", 1, 4)
     quizzes.append(Quiz(question, choices, answer))
-    save_state(quizzes)
+    save_state(quizzes, best_score)
     print("\n✅ 퀴즈가 추가되었습니다!\n")
 
-def save_state(quizzes):
-    """퀴즈 목록을 state.json에 UTF-8로 저장한다."""
-    data = {"quizzes": [quiz.to_dict() for quiz in quizzes]}
+def save_state(quizzes, best_score):
+    """퀴즈 목록과 최고 점수를 state.json에 UTF-8로 저장한다."""
+    data = {"quizzes": [quiz.to_dict() for quiz in quizzes], "best_score": best_score}
     with open(STATE_FILE, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
 
@@ -149,24 +150,40 @@ def show_quizzes(quizzes):
     print("-" * 40)
     print()
 
+def update_best_score(score, best_score):
+    """이번 점수와 최고 점수를 비교해, 더 높은 쪽을 최고 점수로 돌려준다."""
+    if score is None:
+        return best_score
+    if best_score is None or score > best_score:
+        print(f"🎉 최고 점수를 갱신했습니다! ({score}점)\n")
+        return score
+    print(f"최고 점수는 그대로 {best_score}점입니다.\n")
+    return best_score
+
+def show_score(best_score):
+    """최고 점수를 출력한다. 아직 푼 기록이 없으면 안내한다."""
+    if best_score is None:
+        print("\n⚠️ 아직 퀴즈를 푼 기록이 없습니다. 먼저 퀴즈를 풀어 보세요.\n")
+        return
+    print(f"\n🏆 최고 점수: {best_score}점\n")
 
 def main():
     """메뉴를 보여 주고, 고른 번호에 맞는 화면을 실행한다."""
     quizzes = make_default_quizzes()
+    best_score = None
     while True:
         show_menu()
         choice = read_number("선택: ", 1, 5)
         if choice == 1:
-            play_quiz(quizzes)
+            score = play_quiz(quizzes)
+            best_score = update_best_score(score, best_score)
+            save_state(quizzes, best_score)
         elif choice == 2:
-            add_quiz(quizzes)
+            add_quiz(quizzes, best_score)
         elif choice == 3:
             show_quizzes(quizzes)
         elif choice == 4:
-            print("\n🏆 점수 확인 화면입니다. (준비 중)\n")
-        else:
-            print("\n👋 게임을 종료합니다.")
-            break
+            show_score(best_score)
 
 # python3.13 main.py처럼 이 파일을 직접 실행 시 main() 호출
 if __name__ == "__main__":
