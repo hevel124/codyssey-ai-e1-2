@@ -191,3 +191,85 @@ codyssey-ai-e1-2/
 - clone과 pull: `git clone <URL>`로 원격 저장소를 처음 받고, 이후 원격에 생긴 변경은 `git pull`로 가져옴
 
 ## 8. Git 저장소 복제 실습 (clone·pull)
+
+- 원문 절차대로 게임 개발 완료 후 수행: 별도 폴더에 clone → 복제본에서 README 한 줄 추가 후 commit → push → 기존 작업 폴더에서 pull → 반영 확인
+- 이 절의 제목 줄이 복제본에서 추가한 한 줄 (커밋 `41b7711`)
+
+**별도 로컬 디렉터리에 clone**
+```bash
+$ cd ~/dev/code
+$ git clone https://hevel124@github.com/hevel124/codyssey-ai-e1-2.git codyssey-ai-e1-2-clone
+Cloning into 'codyssey-ai-e1-2-clone'...
+remote: Enumerating objects: 77, done.
+remote: Counting objects: 100% (77/77), done.
+remote: Compressing objects: 100% (47/47), done.
+remote: Total 77 (delta 31), reused 67 (delta 21), pack-reused 0 (from 0)
+Receiving objects: 100% (77/77), 3.91 MiB | 16.03 MiB/s, done.
+Resolving deltas: 100% (31/31), done.
+```
+
+**복제본에서 README 한 줄 추가**
+```bash
+$ cd codyssey-ai-e1-2-clone
+$ printf '\n## 8. Git 저장소 복제 실습 (clone·pull)\n' >> README.md
+$ tail -3 README.md
+- clone과 pull: `git clone <URL>`로 원격 저장소를 처음 받고, 이후 원격에 생긴 변경은 `git pull`로 가져옴
+
+## 8. Git 저장소 복제 실습 (clone·pull)
+```
+
+**commit**
+```bash
+$ git add README.md
+$ git commit -m "docs: README에 clone·pull 실습 절 제목 추가 (복제본에서)"
+[main 41b7711] docs: README에 clone·pull 실습 절 제목 추가 (복제본에서)
+ 1 file changed, 2 insertions(+)
+```
+
+**push**
+```bash
+$ git push
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 10 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 406 bytes | 406.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+To https://github.com/hevel124/codyssey-ai-e1-2.git
+   c1e9f3e..41b7711  main -> main
+```
+
+**기존 로컬 작업 디렉터리에서 pull**
+```bash
+$ cd ~/dev/code/codyssey-ai-e1-2
+$ git pull
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 386 bytes | 77.00 KiB/s, done.
+From https://github.com/hevel124/codyssey-ai-e1-2
+   c1e9f3e..41b7711  main       -> origin/main
+Updating c1e9f3e..41b7711
+Fast-forward
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+```
+
+**pull 반영 확인**
+```bash
+$ tail -3 README.md
+- clone과 pull: `git clone <URL>`로 원격 저장소를 처음 받고, 이후 원격에 생긴 변경은 `git pull`로 가져옴
+
+## 8. Git 저장소 복제 실습 (clone·pull)
+$ git --no-pager log --oneline -2
+41b7711 (HEAD -> main, origin/main, origin/HEAD) docs: README에 clone·pull 실습 절 제목 추가 (복제본에서)
+c1e9f3e docs: README 작성 (개요, 실행 방법, 기능, 파일 구조, 데이터 파일)
+```
+- 기존 폴더에서는 README를 수정하지 않았는데 복제본에서 추가한 제목 줄과 커밋 `41b7711`이 있음 → pull로 반영됨
+
+**git log 그래프** (`docs/screenshots/git-log-graph.png`)
+- `35419b7`: `feature/play-quiz` 브랜치를 `main`에 병합한 커밋. 갈라진 선(`|\` ~ `|/`)이 브랜치 작업 구간
+
+![git log --oneline --graph](docs/screenshots/git-log-graph.png)
