@@ -1,6 +1,17 @@
 # 나만의 퀴즈 게임
 
+#list, dict를 json 글자로 바꿔 파일에 쓰는 표준 라이브러리
+import json 
+#파일 경로를 다루는 표준 라이브러리
+from pathlib import Path
+
+
 MENU_LINE = "=" * 40
+
+#Path(__file__).parent: __file__은 지금 실행 중인 main.py의 경로이고, .parent는 그 폴더다. 어느 폴더에서 실행하든 main.py 옆(프로젝트 루트)을 가리킨다.
+#/ "state.json": 폴더 경로 뒤에 파일 이름을 붙인다. Path에서 /는 나눗셈이 아니라 경로 연결이다.
+STATE_FILE = Path(__file__).parent / "state.json"
+
 
 class Quiz:
     """퀴즈 1개(문제, 선택지 4개, 정답 번호)를 표현한다."""
@@ -22,6 +33,10 @@ class Quiz:
     def is_correct(self, user_answer):
         """입력한 번호가 정답 번호와 같으면 True를 돌려준다."""
         return user_answer == self.answer
+    
+    def to_dict(self):
+        """state.json에 쓸 수 있게 dict로 바꿔 돌려준다."""
+        return {"question": self.question, "choices": self.choices, "answer": self.answer}
 
 
 def make_default_quizzes():
@@ -72,6 +87,14 @@ def read_number(prompt, min_value, max_value):
             return number
         print(error_message)
 
+def read_text(prompt):
+    """빈 입력이 아닐 때까지 다시 묻고, 앞뒤 공백을 지운 글자를 돌려준다."""
+    while True:
+        text = input(prompt).strip()
+        if text:
+            return text
+        print("⚠️ 빈 입력입니다. 내용을 입력하세요.")
+
 def play_quiz(quizzes):
     """저장된 퀴즈를 차례로 출제하고, 맞힌 개수와 점수를 출력한다."""
     if not quizzes: #리스트가 비어있으면
@@ -96,6 +119,24 @@ def play_quiz(quizzes):
     print(MENU_LINE)
     print()
 
+def add_quiz(quizzes):
+    """문제·선택지 4개·정답 번호를 입력받아 퀴즈를 추가하고 파일에 저장한다."""
+    print("\n📌 새로운 퀴즈를 추가합니다.\n")
+    question = read_text("문제를 입력하세요: ")
+    choices = []
+    for number in range(1, 5):
+        choices.append(read_text(f"선택지 {number}: "))
+    answer = read_number("정답 번호 (1-4): ", 1, 4)
+    quizzes.append(Quiz(question, choices, answer))
+    save_state(quizzes)
+    print("\n✅ 퀴즈가 추가되었습니다!\n")
+
+def save_state(quizzes):
+    """퀴즈 목록을 state.json에 UTF-8로 저장한다."""
+    data = {"quizzes": [quiz.to_dict() for quiz in quizzes]}
+    with open(STATE_FILE, "w", encoding="utf-8") as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
+
 def main():
     """메뉴를 보여 주고, 고른 번호에 맞는 화면을 실행한다."""
     quizzes = make_default_quizzes()
@@ -105,7 +146,7 @@ def main():
         if choice == 1:
             play_quiz(quizzes)
         elif choice == 2:
-            print("\n📌 퀴즈 추가 화면입니다. (준비 중)\n")
+            add_quiz(quizzes)
         elif choice == 3:
             print("\n📋 퀴즈 목록 화면입니다. (준비 중)\n")
         elif choice == 4:
